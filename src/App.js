@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput } from 'react-native'
+import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput, Dimensions, TouchableOpacity, StatusBar } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 const questions = ['What do you want to do?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?']
+const { height, width } = Dimensions.get('window')
 
 export default class App extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     // sets state to persistent state or initial state
     this.state = {
@@ -35,53 +38,53 @@ export default class App extends Component {
 
   // runs before initial mount
   componentWillMount() {
-    const exercise = this.state.exercise
-    const index = exercise.answers.findIndex(answer => answer === '') // gets first blank answer index
-    if (index !== -1) {
-      const answers = exercise.answers.slice(0, index + 1) // removes answers past the first blank answer
-      // removes blank answers from state
-      this.setState({
-        exercise: {
-          ...exercise,
-          answers: answers
-        },
-        currentAnswer: index
-      })
-    }
-
-    const self = this
-
-    this.setState({ isStoreLoading: true })
-
-    AsyncStorage.getItem('deepStore').then(value => {
-      (value && value.length) ? self.setState({ exercises: JSON.parse(value) }) : self.setState({ exercises: [] })
-      self.setState({ isStoreLoading: false })
-    }).catch(error => {
-      self.setState({ isStoreLoading: false })
-    })
+    // const exercise = this.state.exercise
+    // const index = exercise.answers.findIndex(answer => answer === '') // gets first blank answer index
+    // if (index !== -1) {
+    //   const answers = exercise.answers.slice(0, index + 1) // removes answers past the first blank answer
+    //   // removes blank answers from state
+    //   this.setState({
+    //     exercise: {
+    //       ...exercise,
+    //       answers: answers
+    //     },
+    //     currentAnswer: index
+    //   })
+    // }
+    //
+    // const self = this
+    //
+    // this.setState({ isStoreLoading: true })
+    //
+    // AsyncStorage.getItem('deepStore').then(value => {
+    //   (value && value.length) ? self.setState({ exercises: JSON.parse(value) }) : self.setState({ exercises: [] })
+    //   self.setState({ isStoreLoading: false })
+    // }).catch(error => {
+    //   self.setState({ isStoreLoading: false })
+    // })
   }
 
   // runs after initial mount
   componentDidMount() {
-    if (this.state.started) { // check if started
-      const currentAnswer = this.state.currentAnswer
-      // const elem = document.getElementById(currentAnswer.toString())
-      if (currentAnswer === 0) { // on first answer
-        // jump(document.getElementById('exercise'), {
-        //   duration: 1000,
-        //   callback: () => this.focusElem(currentAnswer.toString())
-        // })
-      } else { // past first answer
-        const id = 'answer' + (currentAnswer - 1)
-        // jump(document.getElementById(id), {
-        //   duration: 1000,
-        //   callback: () => this.focusElem(currentAnswer.toString())
-        // })
-      }
-    } else {
-      // document.getElementById('0').addEventListener('focus', this.removeOnEnter) // adds event listener for focus on first answer
-      // document.addEventListener('keypress', this.onEnter) // global event which will focus on first answer if enter button pressed
-    }
+    // if (this.state.started) { // check if started
+    //   const currentAnswer = this.state.currentAnswer
+    //   // const elem = document.getElementById(currentAnswer.toString())
+    //   if (currentAnswer === 0) { // on first answer
+    //     // jump(document.getElementById('exercise'), {
+    //     //   duration: 1000,
+    //     //   callback: () => this.focusElem(currentAnswer.toString())
+    //     // })
+    //   } else { // past first answer
+    //     const id = 'answer' + (currentAnswer - 1)
+    //     // jump(document.getElementById(id), {
+    //     //   duration: 1000,
+    //     //   callback: () => this.focusElem(currentAnswer.toString())
+    //     // })
+    //   }
+    // } else {
+    //   // document.getElementById('0').addEventListener('focus', this.removeOnEnter) // adds event listener for focus on first answer
+    //   // document.addEventListener('keypress', this.onEnter) // global event which will focus on first answer if enter button pressed
+    // }
     // localStorage.setItem('levelState', JSON.stringify(this.state)) // persists state
     // // set height and value of each answer
     // const answers = document.querySelectorAll('.answer')
@@ -119,15 +122,11 @@ export default class App extends Component {
   componentDidUpdate() {
     // localStorage.setItem('levelState', JSON.stringify(this.state)) // persists state
     // set height and value of each answer
-    const answers = document.querySelectorAll('.answer')
-    for (let i = 0; i < answers.length; i++) {
-      const answer = answers[i]
-      answer.style.height = answer.scrollHeight + "px"
-    }
-  }
-
-  capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    // const answers = document.querySelectorAll('.answer')
+    // for (let i = 0; i < answers.length; i++) {
+    //   const answer = answers[i]
+    //   answer.style.height = answer.scrollHeight + "px"
+    // }
   }
 
   // runs when enter button is originally pressed to start exercise
@@ -181,20 +180,21 @@ export default class App extends Component {
   }
 
   // handle when key down on text area is enter button
-  handleEnter(e, index) {
-    if (e.keyCode === 13) { // enter button keyCode = 13
-      this.next(e, index)
+  handleEnter(e) {
+    if (e.nativeEvent.key == "Enter") { // enter button keyCode = 13
+      this.next()
     }
   }
 
   // runs when answer is changed
-  changeAnswer(index) {
+  changeAnswer(text) {
+    const index = this.state.currentAnswer
     this.setState({
       exercise: {
         ...this.state.exercise,
         answers: [
           ...this.state.exercise.answers.slice(0, index),
-          this.capitalizeFirstLetter(e.target.value),
+          text,
           ...this.state.exercise.answers.slice(index + 1)
         ]
       },
@@ -384,49 +384,43 @@ export default class App extends Component {
     let lastButton
     if (this.state.exercise.answers.length === 7 && this.state.exercise.answers[6] !== '') {
       if (this.state.editing) {
-        lastButton = <TouchableHighlight className="last-button" title="save exercise" type="submit"><Text>SAVE</Text></TouchableHighlight>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton}><Text style={styles.finishExerciseButtonText}>SAVE</Text></TouchableOpacity>
       } else {
-        lastButton = <TouchableHighlight className="last-button" title="finish exercise" type="submit"><Text>FINISH</Text></TouchableHighlight>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton}><Text style={styles.finishExerciseButtonText}>FINISH</Text></TouchableOpacity>
       }
     }
     return (
-      <ScrollView style={{flex: 1}}>
-        <View className="intro">
-          <View className="home-screen">
-            <Text className="title">7 Levels Deep</Text>
-            <Text className="description">Discover Your Why</Text>
-            <View className="start-buttons">
-              <View className="start"></View>
-              <TouchableHighlight className="start-button" title="start exercise" onClick={this.startExercise}><Text>START EXERCISE</Text></TouchableHighlight>
-              <Text className="enter-help">press ENTER</Text>
+      <View style={styles.app}>
+        <StatusBar barStyle='light-content' />
+        <View style={styles.statusBar}></View>
+        <ScrollView style={styles.app}>
+          <View style={styles.intro}>
+            <View style={styles.introContent}>
+              <Text style={styles.title}>7 Levels Deep</Text>
+              <Text style={styles.introText}>Discover Your Why</Text>
+              <TouchableOpacity style={styles.startButton} onPress={this.startExercise}><Text style={styles.startButtonText}>START EXERCISE</Text></TouchableOpacity>
             </View>
           </View>
-        </View>
-        <View id="exercise" className="why">
-          <View className="instruction-info">
-            <Text className="why-title">WHY?</Text>
-            <Text className="why-description">Discover what drives you to take action</Text>
+          <View ref="exercise" style={styles.why}>
+            <Text style={styles.whyTitle}>WHY?</Text>
+            <Text style={styles.whyText}>Discover what drives you to take action</Text>
           </View>
-        </View>
-        <View className="instructions">
-          <View className="instruction-info">
-            <Text className="instructions-title">INSTRUCTIONS</Text>
-            <Text className="instructions-description">Take 10-15 minutes to reflect and answer 7 questions</Text>
+          <View style={styles.instructions}>
+            <Text style={styles.whyTitle}>INSTRUCTIONS</Text>
+            <Text style={styles.whyText}>Take 10-15 minutes to reflect and answer 7 questions</Text>
           </View>
-        </View>
-        <View className="exercise">
-          <View className="small-info">
-            <View className="current-exercise">
+          <View style={styles.exercise}>
+            <View style={styles.exerciseContent}>
               {this.state.exercise.answers.map((answer, index) => {
                 const answerID = "answer" + index
                 return (
-                  <View className="answer-div" key={index} id={answerID}>
-                    <View className="answer-form" onSubmit={(e) => this.next(e, index)}>
-                      <View className="prompt"><Text className="number">{index + 1}.</Text><Text className="question">{questions[index]}</Text></View>
-                      <View className="answer-section">
-                        <TextInput className="answer" type="text" id={index} name={index} value={answer} onKeyDown={(e) => this.handleEnter(e, index)} onChange={(e) => this.changeAnswer(e, index)} onFocus={(e) => this.setCurrent(e, index)} autoComplete="off" />
+                  <View style={styles.answerContainer} key={index} id={answerID}>
+                    <View style={styles.answerContent}>
+                      <View style={styles.answerPropmt}><Text style={styles.answerPromptText}>{index + 1}. {questions[index]}</Text></View>
+                      <View style={styles.answer}>
+                        <TextInput style={styles.answerText} multiline={true} ref={index} value={answer} onKeyPress={this.handleEnter} onChangeText={this.changeAnswer} onFocus={() => this.setCurrent(index)} returnKeyType='next' selectionColor='#474747'  />
                       </View>
-                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableHighlight className="next-button" type="submit"><Text>press ENTER</Text></TouchableHighlight> }
+                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableOpacity style={style.nextButton} onPress={this.next}><Text>next</Text></TouchableOpacity> }
                       { index === 6 && lastButton }
                     </View>
                   </View>
@@ -434,38 +428,219 @@ export default class App extends Component {
               })}
             </View>
           </View>
-        </View>
-        <View id="past">
-          <View className="info">
-            <View className="exercise-content">
-              <Text className="exercise-title">Past Exercises</Text>
-              {this.state.exercises.length > 0 && <View className="past-exercises">
-                {this.state.exercises.map((exercise, index) => (
-                  <View className="past-exercise" key={index}>
-                    <TouchableHighlight className="exercise-date" onPress={(e) => this.loadExercise(e, index)}><Text>{exercise.answers[0]}</Text></TouchableHighlight>
-                    <TouchableHighlight className="exercise-delete" onPress={(e) => this.deleteExercise(e, index)}><Text>Delete</Text></TouchableHighlight>
-                  </View>
-                ))}
-              </View>}
-              <TouchableHighlight className="take-again" onClick={this.startExercise} title="start exercise"><Text>START NEW EXERCISE</Text></TouchableHighlight>
+          <View style={styles.past} ref="past">
+            <View style={styles.pastContent}>
+                <Text style={styles.pastTitle}>Past Exercises</Text>
+                {this.state.exercises.length > 0 && <View styles={styles.pastExercises}>
+                  {this.state.exercises.map((exercise, index) => (
+                    <View style={styles.pastExercise} key={index}>
+                      <TouchableHighlight style={styles.pastExerciseButton} onPress={() => this.loadExercise(index)}><Text style={styles.pastExerciseText}>{exercise.answers[0]}</Text></TouchableHighlight>
+                      <TouchableHighlight style={styles.deletePastExerciseButton} onPress={() => this.deleteExercise(index)}><Text>Delete</Text></TouchableHighlight>
+                    </View>
+                  ))}
+                </View>}
+                <TouchableHighlight style={styles.takeAgainButton} onPress={this.startExercise}><Text style={styles.takeAgainButtonText}>START NEW EXERCISE</Text></TouchableHighlight>
             </View>
           </View>
-        </View>
-        <View className="share">
-          <View className="small-info">
-            <View className="share-title"><Text className="share-title-word">If you found this exercise useful, Share It</Text></View>
-            <View className="social-buttons">
-              <TouchableHighlight className="social-button" title="share to twitter" onPress={this.shareTwitter}><Text>Twitter</Text></TouchableHighlight>
-              <TouchableHighlight className="social-button" title="share to facebook" onPress={this.shareFacebook}><Text>Facebook</Text></TouchableHighlight>
-              <TouchableHighlight className="social-button" title="share to linkedin" onPress={this.shareLinkedin}><Text>Linkedin</Text></TouchableHighlight>
-              <TouchableHighlight className="social-button" title="send email" onPress={this.shareEmail}><Text>Email</Text></TouchableHighlight>
+          <View style={styles.share}>
+            <View style={styles.shareTitleView}><Text style={styles.shareTitle}>If you found this exercise useful,</Text><Text style={styles.shareTitleMain}>Share It</Text></View>
+            <View style={styles.shareButtons}>
+              <TouchableHighlight style={styles.shareButton} onPress={this.shareTwitter}><FontAwesome name="twitter" color="#fff" size={24} /></TouchableHighlight>
+              <TouchableHighlight style={styles.shareButton} onPress={this.shareFacebook}><FontAwesome name="facebook" color="#fff" size={24} /></TouchableHighlight>
+              <TouchableHighlight style={styles.shareButton} onPress={this.shareLinkedin}><FontAwesome name="linkedin" color="#fff" size={24} /></TouchableHighlight>
+              <TouchableHighlight style={styles.shareButton} onPress={this.shareEmail}><MaterialIcons name="email" color="#fff" size={24} /></TouchableHighlight>
             </View>
           </View>
-        </View>
-        <View className="footer">
-          <Text className="footer-info">Made with heart by Parker Klein</Text>
-        </View>
-      </ScrollView>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Made with <FontAwesome name="heart" color="#e85454" size={14} /> by Parker Klein</Text>
+          </View>
+        </ScrollView>
+      </View>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  app: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+  },
+  statusBar: {
+    backgroundColor: '#e85454',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 20,
+    zIndex: 20,
+  },
+  intro: {
+    height: height,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  introContent: {
+    alignItems: 'center',
+  },
+  title: {
+    color: '#e85454',
+    fontSize: 52,
+    textAlign: 'center',
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  introText: {
+    color: '#474747',
+    fontSize: 28,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  startButton: {
+    backgroundColor: '#e85454',
+    height: 44,
+    width: (width/2),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 22,
+  },
+  startButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  why: {
+    height: (height/6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor:'#fff',
+    paddingTop: 10,
+  },
+  whyTitle: {
+    color: '#e85454',
+    marginBottom: 5,
+    fontWeight: '800',
+    fontSize: 18,
+  },
+  whyText: {
+    color: '#474747',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  instructions: {
+    height: (height/6),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor:'#fff',
+    paddingBottom: 20,
+  },
+  exercise: {
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  exerciseContent: {
+
+  },
+  answerContainer: {
+    margin: 12,
+  },
+  answerContent: {
+  },
+  answerPropmt: {
+    marginBottom: 5,
+  },
+  answerPromptText: {
+    color: '#e85454',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  answer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    flex: 1,
+    minHeight: 40,
+  },
+  answerText: {
+    fontSize: 14,
+    color: '#474747',
+    lineHeight: 20,
+    minHeight: 40,
+    padding: 8,
+  },
+  nextButton: {
+
+  },
+  past: {
+    minHeight: height/2,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+    paddingTop: 20,
+  },
+  pastTitle: {
+    textAlign: 'center',
+    color: '#e85454',
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  takeAgainButton: {
+    width: width/2,
+    backgroundColor: '#e85454',
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  takeAgainButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  share: {
+    height: height/2,
+    alignItems: 'center',
+    padding: 20,
+    justifyContent: 'space-around',
+  },
+  shareTitleView: {
+  },
+  shareTitle: {
+    color: '#474747',
+    textAlign: 'center',
+    fontWeight: '500',
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  shareTitleMain: {
+    color: '#e85454',
+    fontSize: 28,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  shareButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+  },
+  shareButton: {
+    width: width/5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e85454',
+    height: width/5,
+    borderRadius: width/10,
+    margin: 5,
+  },
+  footer: {
+    backgroundColor: '#fff',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    textAlign: 'center',
+    color: '#474747'
+  }
+})
