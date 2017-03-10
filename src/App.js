@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput, Dimensions, TouchableOpacity, StatusBar } from 'react-native'
+import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput, Dimensions, TouchableOpacity, StatusBar, findNodeHandle } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+
+const URL = 'http://www.7levelsdeep.com'
 
 const questions = ['What do you want to do?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?']
 const { height, width } = Dimensions.get('window')
@@ -25,8 +29,6 @@ export default class App extends Component {
     }
 
     // bind functions to this
-    this.onEnter = this.onEnter.bind(this)
-    this.removeOnEnter = this.removeOnEnter.bind(this)
     this.startExercise = this.startExercise.bind(this)
     this.handleEnter = this.handleEnter.bind(this)
     this.changeAnswer = this.changeAnswer.bind(this)
@@ -129,29 +131,8 @@ export default class App extends Component {
     // }
   }
 
-  // runs when enter button is originally pressed to start exercise
-  onEnter(e) {
-    if (e.keyCode === 13) { // if enter button pressed
-      this.startExercise() // start exercise
-      // document.removeEventListener('keypress', this.onEnter) // remove onEnter event listener
-    }
-  }
-
-  // removes onEnver event listener on focus of first answer
-  removeOnEnter() {
-    // document.removeEventListener('keypress', this.onEnter) // remove onEnter event listener
-    // document.getElementById('0').removeEventListener('focus', this.removeOnEnter) // remove focus event listener from first answer input
-  }
-
-  // focuses on element
-  focusElem(id) {
-    // const elem = document.getElementById(id)
-    // elem.focus()
-  }
-
   // starts exercise
   startExercise() {
-    // create new exercise and sets started to true
     this.setState({
       exercise: {
         date: Date.now(),
@@ -160,11 +141,7 @@ export default class App extends Component {
       started: true,
       editing: false
     })
-    // jump(document.getElementById('exercise'), {
-    //   duration: 1000,
-    //   callback: () => this.focusElem('0')
-    // })
-    this.removeOnEnter() // remove onEnter event listener
+    this.refs.answer0.focus()
   }
 
   // sets currentAnser index to the focused answer's index
@@ -172,11 +149,6 @@ export default class App extends Component {
     this.setState({
       currentAnswer: index
     })
-    // const elem = document.getElementById(index)
-    // elem.style.height = elem.scrollHeight + "px";
-    // const val = elem.value
-    // elem.value = ''
-    // elem.value = this.capitalizeFirstLetter(val)
   }
 
   // handle when key down on text area is enter button
@@ -187,8 +159,11 @@ export default class App extends Component {
   }
 
   // runs when answer is changed
-  changeAnswer(text) {
-    const index = this.state.currentAnswer
+  changeAnswer(text, index) {
+    const match = /\r|\n/.exec(text)
+    if (match) {
+      text = text.trim()
+    }
     this.setState({
       exercise: {
         ...this.state.exercise,
@@ -197,127 +172,88 @@ export default class App extends Component {
           text,
           ...this.state.exercise.answers.slice(index + 1)
         ]
-      },
-      currentAnswer: index
+      }
     })
-    // const elem = document.getElementById(index)
-    // elem.style.height = elem.scrollHeight + "px";
   }
 
   // runs on enter when focused on answer
-  next(e, index) {
-    // e.preventDefault() // prevent default event
-    // const state = this.state
-    // const currentAnswer = state.currentAnswer
-    // const exercise = state.exercise
-    // let answers = exercise.answers
-    // const answer = answers[currentAnswer]
-    // if (answer === '') { // if current answer is empty
-    //   this.focusElem(currentAnswer.toString())
-    //   return
-    // }
-    // const answersLength = answers.length
-    // if (index === 6) { // last button clicked
-    //   let exercises = state.exercises
-    //   if (!state.editing) { // not editing
-    //     axios.post('/api/count')
-    //     this.setState({
-    //       exercises: exercises.concat([exercise]),
-    //       exercise: {
-    //         date: Date.now(),
-    //         answers: ['']
-    //       },
-    //       started: false,
-    //       currentAnswer: 0
-    //     }, () => jump(document.getElementById('past'), {
-    //       duration: 700
-    //     }))
-    //     ReactGA.event({
-    //       category: 'Exercise',
-    //       action: 'Finish',
-    //       label: 'Finish Exercise'
-    //     })
-    //   } else { // we are editing
-    //     const editIndex = exercises.findIndex(e => e.date === exercise.date) // find exercise with the same date
-    //     if (editIndex === -1) { // could not find the exercise we were editing
-    //       this.setState({
-    //         exercises: exercises.concat([exercise]),
-    //         exercise: {
-    //           date: Date.now(),
-    //           answers: ['']
-    //         },
-    //         started: false,
-    //         editing: false,
-    //         currentAnswer: 0
-    //       }, () => jump(document.getElementById('past'), {
-    //         duration: 700
-    //       }))
-    //     } else { // add new exercise to exercises and reset exercise
-    //       exercises = [
-    //         ...exercises.slice(0, editIndex),
-    //         exercise,
-    //         ...exercises.slice(editIndex + 1)
-    //       ]
-    //       this.setState({
-    //         exercises: exercises,
-    //         exercise: {
-    //           date: Date.now(),
-    //           answers: ['']
-    //         },
-    //         started: false,
-    //         editing: false,
-    //         currentAnswer: 0
-    //       }, () => jump(document.getElementById('past'), {
-    //         duration: 700
-    //       }))
-    //     }
-    //   }
-    // } else { // not on last question
-    //   if (this.isMobile()) {
-    //     if (currentAnswer === answersLength - 1) { // no answers ahead of the current answer
-    //       answers = answers.concat([''])
-    //       this.setState({
-    //         exercise: {
-    //           ...exercise,
-    //           answers: answers
-    //         },
-    //         currentAnswer: answersLength
-    //       }, () => this.focusElem(answersLength.toString()))
-    //       return
-    //     } else { // current answer is not the last answer answered
-    //       const nextAnswer = currentAnswer + 1
-    //       this.setState({
-    //         currentAnswer: currentAnswer + 1
-    //       }, () => this.focusElem(nextAnswer))
-    //     }
-    //   } else {
-    //     if (currentAnswer === answersLength - 1) { // no answers ahead of the current answer
-    //       answers = answers.concat([''])
-    //       this.setState({
-    //         exercise: {
-    //           ...exercise,
-    //           answers: answers
-    //         },
-    //         currentAnswer: answersLength
-    //       })
-    //       jump(document.getElementById('answer' + (currentAnswer)), {
-    //         duration: 700,
-    //         callback: () => this.focusElem(answersLength.toString())
-    //       })
-    //       return
-    //     } else { // current answer is not the last answer answered
-    //       const nextAnswer = currentAnswer + 1
-    //       this.setState({
-    //         currentAnswer: currentAnswer + 1
-    //       })
-    //       const Id = 'answer' + currentAnswer
-    //       jump(document.getElementById(Id), {
-    //         duration: 700,
-    //         callback: () => this.focusElem(nextAnswer)
-    //       })
-    //     }
-    //   }
-    // }
+  next() {
+    const state = this.state
+    const index = state.currentAnswer
+    console.log('index', index)
+    const exercise = state.exercise
+    let answers = exercise.answers
+    const answer = answers[index]
+    const thisAnswer = 'answer' + index.toString()
+    console.log('thisAnswer', thisAnswer)
+    const nextAnswer = 'answer' + (index + 1).toString()
+    console.log('nextAnswer', nextAnswer)
+    if (answer === '') { // if current answer is empty
+      this.refs[thisAnswer].focus()
+      return
+    }
+    const answersLength = answers.length
+    if (index === 6) { // last button clicked
+      let exercises = state.exercises
+      if (!state.editing) { // not editing
+        fetch(URL + '/api/count', { method: 'POST' })
+        this.setState({
+          exercises: exercises.concat([exercise]),
+          exercise: {
+            date: Date.now(),
+            answers: ['']
+          },
+          started: false,
+          currentAnswer: 0
+        })
+      } else { // we are editing
+        const editIndex = exercises.findIndex(e => e.date === exercise.date) // find exercise with the same date
+        if (editIndex === -1) { // could not find the exercise we were editing
+          this.setState({
+            exercises: exercises.concat([exercise]),
+            exercise: {
+              date: Date.now(),
+              answers: ['']
+            },
+            started: false,
+            editing: false,
+            currentAnswer: 0
+          })
+        } else { // add new exercise to exercises and reset exercise
+          exercises = [
+            ...exercises.slice(0, editIndex),
+            exercise,
+            ...exercises.slice(editIndex + 1)
+          ]
+          this.setState({
+            exercises: exercises,
+            exercise: {
+              date: Date.now(),
+              answers: ['']
+            },
+            started: false,
+            editing: false,
+            currentAnswer: 0
+          })
+        }
+      }
+    } else { // not on last question
+      if (index === answersLength - 1) { // no answers ahead of the current answer
+        answers = answers.concat([''])
+        this.setState({
+          exercise: {
+            ...exercise,
+            answers: answers
+          },
+          currentAnswer: answersLength
+        }, () => this.refs[nextAnswer].focus())
+        return
+      } else { // current answer is not the last answer answered
+        this.setState({
+          currentAnswer: index + 1
+        }, () => this.refs[nextAnswer].focus())
+      }
+    }
   }
 
   // load past exercise
@@ -328,11 +264,7 @@ export default class App extends Component {
       exercise: exercise,
       editing: true,
       started: true
-    })
-    // jump(document.getElementById('answer0'), {
-    //   duration: 700,
-    //   callback: () => this.focusElem('0')
-    // })
+    }, () => this.refs.answer0.focus())
   }
 
   // delete past exercise
@@ -384,16 +316,16 @@ export default class App extends Component {
     let lastButton
     if (this.state.exercise.answers.length === 7 && this.state.exercise.answers[6] !== '') {
       if (this.state.editing) {
-        lastButton = <TouchableOpacity style={styles.finishExerciseButton}><Text style={styles.finishExerciseButtonText}>SAVE</Text></TouchableOpacity>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={this.next}><Text style={styles.finishExerciseButtonText}>SAVE</Text></TouchableOpacity>
       } else {
-        lastButton = <TouchableOpacity style={styles.finishExerciseButton}><Text style={styles.finishExerciseButtonText}>FINISH</Text></TouchableOpacity>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={this.next}><Text style={styles.finishExerciseButtonText}>FINISH</Text></TouchableOpacity>
       }
     }
     return (
       <View style={styles.app}>
         <StatusBar barStyle='light-content' />
         <View style={styles.statusBar}></View>
-        <ScrollView style={styles.app}>
+        <KeyboardAwareScrollView style={styles.app} ref='scroll'>
           <View style={styles.intro}>
             <View style={styles.introContent}>
               <Text style={styles.title}>7 Levels Deep</Text>
@@ -401,7 +333,7 @@ export default class App extends Component {
               <TouchableOpacity style={styles.startButton} onPress={this.startExercise}><Text style={styles.startButtonText}>START EXERCISE</Text></TouchableOpacity>
             </View>
           </View>
-          <View ref="exercise" style={styles.why}>
+          <View style={styles.why}>
             <Text style={styles.whyTitle}>WHY?</Text>
             <Text style={styles.whyText}>Discover what drives you to take action</Text>
           </View>
@@ -412,15 +344,15 @@ export default class App extends Component {
           <View style={styles.exercise}>
             <View style={styles.exerciseContent}>
               {this.state.exercise.answers.map((answer, index) => {
-                const answerID = "answer" + index
+                const refId = "answer" + index.toString()
                 return (
-                  <View style={styles.answerContainer} key={index} id={answerID}>
+                  <View style={styles.answerContainer} key={index}>
                     <View style={styles.answerContent}>
                       <View style={styles.answerPropmt}><Text style={styles.answerPromptText}>{index + 1}. {questions[index]}</Text></View>
                       <View style={styles.answer}>
-                        <TextInput style={styles.answerText} multiline={true} ref={index} value={answer} onKeyPress={this.handleEnter} onChangeText={this.changeAnswer} onFocus={() => this.setCurrent(index)} returnKeyType='next' selectionColor='#474747'  />
+                        <AutoGrowingTextInput style={styles.answerText} multiline={true} ref={refId} value={answer} onKeyPress={(e) => this.handleEnter(e)} onChangeText={(text) => this.changeAnswer(text, index)} onFocus={() => this.setCurrent(index)} returnKeyType='next' selectionColor='#474747'  />
                       </View>
-                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableOpacity style={style.nextButton} onPress={this.next}><Text>next</Text></TouchableOpacity> }
+                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableOpacity style={styles.nextButton} onPress={this.next}><Text>next</Text></TouchableOpacity> }
                       { index === 6 && lastButton }
                     </View>
                   </View>
@@ -454,7 +386,7 @@ export default class App extends Component {
           <View style={styles.footer}>
             <Text style={styles.footerText}>Made with <FontAwesome name="heart" color="#e85454" size={14} /> by Parker Klein</Text>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     )
   }
