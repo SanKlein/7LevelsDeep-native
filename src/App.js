@@ -5,7 +5,7 @@ import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
-const URL = 'http://www.7levelsdeep.com'
+const URL = 'https://levelsdeep.herokuapp.com'
 
 const questions = ['What do you want to do?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?', 'Why is that important to you?']
 const { height, width } = Dimensions.get('window')
@@ -180,14 +180,11 @@ export default class App extends Component {
   next() {
     const state = this.state
     const index = state.currentAnswer
-    console.log('index', index)
     const exercise = state.exercise
     let answers = exercise.answers
     const answer = answers[index]
     const thisAnswer = 'answer' + index.toString()
-    console.log('thisAnswer', thisAnswer)
     const nextAnswer = 'answer' + (index + 1).toString()
-    console.log('nextAnswer', nextAnswer)
     if (answer === '') { // if current answer is empty
       this.refs[thisAnswer].focus()
       return
