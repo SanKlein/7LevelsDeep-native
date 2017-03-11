@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput, Dimensions, TouchableOpacity, StatusBar, findNodeHandle } from 'react-native'
+import { StyleSheet, ScrollView, View, Text, TouchableHighlight, AsyncStorage, TextInput, Dimensions, TouchableOpacity, Linking } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { AutoGrowingTextInput } from 'react-native-autogrow-textinput'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -38,69 +38,15 @@ export default class App extends Component {
     this.deleteExercise = this.deleteExercise.bind(this)
   }
 
-  // runs before initial mount
   componentWillMount() {
-    // const exercise = this.state.exercise
-    // const index = exercise.answers.findIndex(answer => answer === '') // gets first blank answer index
-    // if (index !== -1) {
-    //   const answers = exercise.answers.slice(0, index + 1) // removes answers past the first blank answer
-    //   // removes blank answers from state
-    //   this.setState({
-    //     exercise: {
-    //       ...exercise,
-    //       answers: answers
-    //     },
-    //     currentAnswer: index
-    //   })
-    // }
-    //
-    // const self = this
-    //
-    // this.setState({ isStoreLoading: true })
-    //
-    // AsyncStorage.getItem('deepStore').then(value => {
-    //   (value && value.length) ? self.setState({ exercises: JSON.parse(value) }) : self.setState({ exercises: [] })
-    //   self.setState({ isStoreLoading: false })
-    // }).catch(error => {
-    //   self.setState({ isStoreLoading: false })
-    // })
-  }
-
-  // runs after initial mount
-  componentDidMount() {
-    // if (this.state.started) { // check if started
-    //   const currentAnswer = this.state.currentAnswer
-    //   // const elem = document.getElementById(currentAnswer.toString())
-    //   if (currentAnswer === 0) { // on first answer
-    //     // jump(document.getElementById('exercise'), {
-    //     //   duration: 1000,
-    //     //   callback: () => this.focusElem(currentAnswer.toString())
-    //     // })
-    //   } else { // past first answer
-    //     const id = 'answer' + (currentAnswer - 1)
-    //     // jump(document.getElementById(id), {
-    //     //   duration: 1000,
-    //     //   callback: () => this.focusElem(currentAnswer.toString())
-    //     // })
-    //   }
-    // } else {
-    //   // document.getElementById('0').addEventListener('focus', this.removeOnEnter) // adds event listener for focus on first answer
-    //   // document.addEventListener('keypress', this.onEnter) // global event which will focus on first answer if enter button pressed
-    // }
-    // localStorage.setItem('levelState', JSON.stringify(this.state)) // persists state
-    // // set height and value of each answer
-    // const answers = document.querySelectorAll('.answer')
-    // for (let i = 0; i < answers.length; i++) {
-    //   const answer = answers[i]
-    //   answer.style.height = answer.scrollHeight + "px"
-    //   const val = answer.value
-    //   answer.value = ''
-    //   answer.value = this.capitalizeFirstLetter(val)
-    // }
+    AsyncStorage.getItem('levelsStore').then(value => {
+      if (value && value.length) {
+        this.setState(JSON.parse(value))
+      }
+    }).catch(error => null)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    // run checks to see if component should update
     const state = this.state
     if (state.exercises !== nextState.exercises) {
       return true
@@ -120,18 +66,10 @@ export default class App extends Component {
     return false
   }
 
-  // runs after each update of state
   componentDidUpdate() {
-    // localStorage.setItem('levelState', JSON.stringify(this.state)) // persists state
-    // set height and value of each answer
-    // const answers = document.querySelectorAll('.answer')
-    // for (let i = 0; i < answers.length; i++) {
-    //   const answer = answers[i]
-    //   answer.style.height = answer.scrollHeight + "px"
-    // }
+    AsyncStorage.setItem('levelsStore', JSON.stringify(this.state))
   }
 
-  // starts exercise
   startExercise() {
     this.setState({
       exercise: {
@@ -144,21 +82,18 @@ export default class App extends Component {
     this.refs.answer0.focus()
   }
 
-  // sets currentAnser index to the focused answer's index
   setCurrent(index) {
     this.setState({
       currentAnswer: index
     })
   }
 
-  // handle when key down on text area is enter button
   handleEnter(e) {
-    if (e.nativeEvent.key == "Enter") { // enter button keyCode = 13
+    if (e.nativeEvent.key == "Enter") {
       this.next()
     }
   }
 
-  // runs when answer is changed
   changeAnswer(text, index) {
     const match = /\r|\n/.exec(text)
     if (match) {
@@ -176,10 +111,9 @@ export default class App extends Component {
     })
   }
 
-  // runs on enter when focused on answer
-  next() {
+  next(set) {
     const state = this.state
-    const index = state.currentAnswer
+    const index = set ? set : state.currentAnswer
     const exercise = state.exercise
     let answers = exercise.answers
     const answer = answers[index]
@@ -202,7 +136,7 @@ export default class App extends Component {
           },
           started: false,
           currentAnswer: 0
-        })
+        }, () => this.refs.scroll.scrollToPosition(0, height, true))
       } else { // we are editing
         const editIndex = exercises.findIndex(e => e.date === exercise.date) // find exercise with the same date
         if (editIndex === -1) { // could not find the exercise we were editing
@@ -215,7 +149,7 @@ export default class App extends Component {
             started: false,
             editing: false,
             currentAnswer: 0
-          })
+          }, () => this.refs.scroll.scrollToPosition(0, height, true))
         } else { // add new exercise to exercises and reset exercise
           exercises = [
             ...exercises.slice(0, editIndex),
@@ -253,7 +187,6 @@ export default class App extends Component {
     }
   }
 
-  // load past exercise
   loadExercise(index) {
     const exercise = this.state.exercises[index]
     this.setState({
@@ -264,7 +197,6 @@ export default class App extends Component {
     }, () => this.refs.answer0.focus())
   }
 
-  // delete past exercise
   deleteExercise(index) {
     const exercises = this.state.exercises
     const exercise = exercises[index]
@@ -279,49 +211,38 @@ export default class App extends Component {
     })
   }
 
-  // format past exercise date
-  formatDate(date) {
-    const end = new Date(date)
-    const day = end.getDate()
-    const month = end.getMonth()
-    const year = end.getFullYear()
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    return `${months[month]} - ${day < 10 ? '0' : ''}${day} - ${year}`
-  }
-
   shareTwitter() {
-    // window.open('https://twitter.com/intent/tweet?text=www.7levelsdeep.com')
+    Linking.openURL('https://twitter.com/intent/tweet?text=Discover Your Why. www.7levelsdeep.com')
   }
 
   shareFacebook() {
-    // window.open('https://www.facebook.com/dialog/share?app_id=1656429184383922&display=popup&href=http://www.7levelsdeep.com&redirect_uri=http://www.7levelsdeep.com/')
+    Linking.openURL('https://www.facebook.com/dialog/share?app_id=1656429184383922&display=popup&href=http://www.7levelsdeep.com&redirect_uri=http://www.7levelsdeep.com/')
   }
 
   shareLinkedin() {
-    // window.open('http://www.linkedin.com/shareArticle?mini=true&url=http://www.7levelsdeep.com&title=Discover%20Your%20Why&description=A%20short%20exercise%20to%20help%20discover%20your%20why')
+    Linking.openURL('http://www.linkedin.com/shareArticle?mini=true&url=http://www.7levelsdeep.com&title=Discover%20Your%20Why&description=A%20short%20exercise%20to%20help%20discover%20your%20why')
   }
 
   shareEmail() {
-    // window.open('mailto:?subject=Discover Your Why&body=www.7levelsdeep.com')
+    Linking.openURL('mailto:?subject=Discover Your Why&body=www.7levelsdeep.com')
   }
 
   openLink() {
-    // window.open('http://www.parkerklein.me/')
+    Linking.openURL('http://www.parkerklein.me/')
   }
 
   render() {
     let lastButton
     if (this.state.exercise.answers.length === 7 && this.state.exercise.answers[6] !== '') {
       if (this.state.editing) {
-        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={this.next}><Text style={styles.finishExerciseButtonText}>SAVE</Text></TouchableOpacity>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={() => this.next(6)}><Text style={styles.finishExerciseButtonText}>SAVE</Text></TouchableOpacity>
       } else {
-        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={this.next}><Text style={styles.finishExerciseButtonText}>FINISH</Text></TouchableOpacity>
+        lastButton = <TouchableOpacity style={styles.finishExerciseButton} onPress={() => this.next(6)}><Text style={styles.finishExerciseButtonText}>FINISH</Text></TouchableOpacity>
       }
     }
+
     return (
       <View style={styles.app}>
-        <StatusBar barStyle='light-content' />
-        <View style={styles.statusBar}></View>
         <KeyboardAwareScrollView style={styles.app} ref='scroll'>
           <View style={styles.intro}>
             <View style={styles.introContent}>
@@ -349,7 +270,7 @@ export default class App extends Component {
                       <View style={styles.answer}>
                         <AutoGrowingTextInput style={styles.answerText} multiline={true} ref={refId} value={answer} onKeyPress={(e) => this.handleEnter(e)} onChangeText={(text) => this.changeAnswer(text, index)} onFocus={() => this.setCurrent(index)} returnKeyType='next' selectionColor='#474747'  />
                       </View>
-                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableOpacity style={styles.nextButton} onPress={this.next}><Text>next</Text></TouchableOpacity> }
+                      { answer !== '' && this.state.currentAnswer === index && index !== 6 && <TouchableOpacity style={styles.nextButton} onPress={() => this.next()}><Text style={styles.nextButtonText}>Next</Text></TouchableOpacity> }
                       { index === 6 && lastButton }
                     </View>
                   </View>
@@ -358,30 +279,28 @@ export default class App extends Component {
             </View>
           </View>
           <View style={styles.past} ref="past">
-            <View style={styles.pastContent}>
-                <Text style={styles.pastTitle}>Past Exercises</Text>
-                {this.state.exercises.length > 0 && <View styles={styles.pastExercises}>
-                  {this.state.exercises.map((exercise, index) => (
-                    <View style={styles.pastExercise} key={index}>
-                      <TouchableHighlight style={styles.pastExerciseButton} onPress={() => this.loadExercise(index)}><Text style={styles.pastExerciseText}>{exercise.answers[0]}</Text></TouchableHighlight>
-                      <TouchableHighlight style={styles.deletePastExerciseButton} onPress={() => this.deleteExercise(index)}><Text>Delete</Text></TouchableHighlight>
-                    </View>
-                  ))}
-                </View>}
-                <TouchableHighlight style={styles.takeAgainButton} onPress={this.startExercise}><Text style={styles.takeAgainButtonText}>START NEW EXERCISE</Text></TouchableHighlight>
-            </View>
+              <Text style={styles.pastTitle}>Past Exercises</Text>
+              {this.state.exercises.length > 0 && <View style={styles.pastExercises}>
+                {this.state.exercises.map((exercise, index) => (
+                  <View style={styles.pastExercise} key={index}>
+                    <TouchableHighlight style={styles.pastExerciseButton} onPress={() => this.loadExercise(index)} underlayColor="#f0f0f0"><Text style={styles.pastExerciseText} ellipsizeMode='tail' numberOfLines={1}>{exercise.answers[0]}</Text></TouchableHighlight>
+                    <TouchableHighlight style={styles.deletePastExerciseButton} onPress={() => this.deleteExercise(index)} underlayColor="#f0f0f0"><Text style={styles.deletePastExerciseButtonText}>Delete</Text></TouchableHighlight>
+                  </View>
+                ))}
+              </View>}
+              <TouchableHighlight style={styles.takeAgainButton} onPress={this.startExercise}><Text style={styles.takeAgainButtonText}>START NEW EXERCISE</Text></TouchableHighlight>
           </View>
           <View style={styles.share}>
             <View style={styles.shareTitleView}><Text style={styles.shareTitle}>If you found this exercise useful,</Text><Text style={styles.shareTitleMain}>Share It</Text></View>
             <View style={styles.shareButtons}>
-              <TouchableHighlight style={styles.shareButton} onPress={this.shareTwitter}><FontAwesome name="twitter" color="#fff" size={24} /></TouchableHighlight>
-              <TouchableHighlight style={styles.shareButton} onPress={this.shareFacebook}><FontAwesome name="facebook" color="#fff" size={24} /></TouchableHighlight>
-              <TouchableHighlight style={styles.shareButton} onPress={this.shareLinkedin}><FontAwesome name="linkedin" color="#fff" size={24} /></TouchableHighlight>
-              <TouchableHighlight style={styles.shareButton} onPress={this.shareEmail}><MaterialIcons name="email" color="#fff" size={24} /></TouchableHighlight>
+              <TouchableOpacity style={styles.shareButton} onPress={this.shareTwitter}><FontAwesome name="twitter" color="#e85454" size={24} /></TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={this.shareFacebook}><FontAwesome name="facebook" color="#e85454" size={24} /></TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={this.shareLinkedin}><FontAwesome name="linkedin" color="#e85454" size={24} /></TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={this.shareEmail}><MaterialIcons name="email" color="#e85454" size={24} /></TouchableOpacity>
             </View>
           </View>
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Made with <FontAwesome name="heart" color="#e85454" size={14} /> by Parker Klein</Text>
+            <Text style={styles.footerText}>Made with <FontAwesome name="heart" color="#e85454" size={14} /> by </Text><TouchableOpacity style={styles.myLink} onPress={this.openLink}><Text style={styles.myLinkText}>Parker Klein</Text></TouchableOpacity>
           </View>
         </KeyboardAwareScrollView>
       </View>
@@ -393,15 +312,6 @@ const styles = StyleSheet.create({
   app: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-  },
-  statusBar: {
-    backgroundColor: '#e85454',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 20,
-    zIndex: 20,
   },
   intro: {
     height: height,
@@ -435,7 +345,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   why: {
     height: (height/6),
@@ -443,6 +353,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor:'#fff',
     paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   whyTitle: {
     color: '#e85454',
@@ -461,103 +373,168 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor:'#fff',
-    paddingBottom: 20,
+    paddingBottom: 25,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   exercise: {
     paddingTop: 20,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   exerciseContent: {
 
   },
   answerContainer: {
-    margin: 12,
+    margin: 20,
   },
   answerContent: {
   },
   answerPropmt: {
-    marginBottom: 5,
+    marginBottom: 7,
   },
   answerPromptText: {
     color: '#e85454',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: '700',
+    fontSize: 18,
   },
   answer: {
     backgroundColor: '#fff',
     borderRadius: 8,
     flex: 1,
     minHeight: 40,
+    paddingTop: 5,
+    paddingBottom: 10,
+    paddingLeft: 12,
+    paddingRight: 12,
   },
   answerText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#474747',
-    lineHeight: 20,
+    lineHeight: 24,
     minHeight: 40,
-    padding: 8,
   },
   nextButton: {
-
+    alignItems: 'flex-end',
+    paddingTop: 4,
+    paddingRight: 8,
   },
-  past: {
-    minHeight: height/2,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    justifyContent: 'space-between',
-    paddingTop: 20,
+  nextButtonText: {
+    fontSize: 14,
+    color: '#777'
   },
-  pastTitle: {
-    textAlign: 'center',
-    color: '#e85454',
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  takeAgainButton: {
-    width: width/2,
+  finishExerciseButton: {
+    width: width - 40,
     backgroundColor: '#e85454',
     height: 44,
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 40,
   },
-  takeAgainButtonText: {
+  finishExerciseButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  past: {
+    minHeight: height/3,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+  },
+  pastTitle: {
+    textAlign: 'center',
+    color: '#e85454',
+    fontSize: 24,
+    fontWeight: '800',
+    marginTop: 30,
+    marginBottom: 15,
+  },
+  pastExercises: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    width: width,
+  },
+  pastExercise: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  pastExerciseButton: {
+    flex: 4,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 20,
+  },
+  pastExerciseText: {
+    color: '#474747',
+  },
+  deletePastExerciseButton: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flex: 1,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deletePastExerciseButtonText: {
+    color: '#e85454',
+    textAlign: 'center',
+  },
+  takeAgainButton: {
+    width: width * 4 / 5,
+    backgroundColor: '#f0f0f0',
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+    marginTop: 15,
+  },
+  takeAgainButtonText: {
+    color: '#e85454',
+    fontSize: 14,
+    fontWeight: '700',
     textAlign: 'center',
   },
   share: {
     height: height/2,
     alignItems: 'center',
     padding: 20,
-    justifyContent: 'space-around',
+    justifyContent: 'center',
   },
   shareTitleView: {
+    marginBottom: 40,
   },
   shareTitle: {
     color: '#474747',
     textAlign: 'center',
     fontWeight: '500',
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 5,
   },
   shareTitleMain: {
     color: '#e85454',
-    fontSize: 28,
+    fontSize: 32,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '800',
   },
   shareButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 40,
+    justifyContent: 'space-around',
+    marginBottom: 20,
   },
   shareButton: {
     width: width/5,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#e85454',
+    backgroundColor: '#fff',
     height: width/5,
     borderRadius: width/10,
     margin: 5,
@@ -567,9 +544,15 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
   },
   footerText: {
     textAlign: 'center',
-    color: '#474747'
-  }
+    color: '#474747',
+  },
+  myLink: {
+  },
+  myLinkText: {
+    color: '#e85454',
+  },
 })
