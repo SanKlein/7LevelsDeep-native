@@ -7,20 +7,42 @@
     "test": "jest"
   },
   "dependencies": {
+    "babel-eslint": "^10.0.1",
+    "bson-objectid": "^1.2.4",
+    "eslint": "^5.10.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-config-react-app": "^3.0.5",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "babel-preset-react-native": "^4.0.1",
     "react": "16.8.3",
     "react-native": "0.59.8",
     "react-native-keyboard-spacer": "^0.4.1",
     "react-native-vector-icons": "^4.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/runtime": "^7.4.4",
-    "babel-jest": "^24.8.0",
-    "jest": "^24.8.0",
-    "metro-react-native-babel-preset": "^0.54.1",
-    "react-test-renderer": "16.8.3"
+    "babel-jest": "23.6.0",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.50.0",
+    "react-test-renderer": "16.6.1"
   },
   "jest": {
     "preset": "react-native"
+  },
+  "eslintConfig": {
+    "extends": ["react-app", "airbnb"],
+    "rules": {
+      "consistent-return": 2,
+      "extensions": 2,
+      "no-underscore-dangle": [
+        2,
+        {
+          "allow": ["_id"]
+        }
+      ],
+      "no-unresolved": 2
+    }
   }
 }
