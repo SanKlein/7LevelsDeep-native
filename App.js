@@ -150,7 +150,7 @@ class App extends Component {
     const hasExercises = !!pastAnswers.length;
 
     return (
-      <View style={styles.app}>
+      <SafeAreaView style={styles.app}>
         <ScrollView>
           <Text style={styles.title}>7 Levels Deep</Text>
           <Text style={styles.introText}>Discover Your Why</Text>
@@ -163,7 +163,7 @@ class App extends Component {
           {!hasExercises && (
             <View style={styles.instructions}>
               <Text style={styles.whyTitle}>WHY?</Text>
-              <Text style={styles.whyText}>Discover why you to take action</Text>
+              <Text style={styles.whyText}>Discover why you take action</Text>
             </View>
           )}
           <TouchableOpacity style={styles.startButton} onPress={this.startExercise}>
@@ -225,7 +225,7 @@ class App extends Component {
             </TouchableOpacity>
           )}
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 }

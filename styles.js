@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet } from 'react-native';
 
-const { height, width } = Dimensions.get('screen');
+const { width } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   app: {
@@ -12,15 +12,15 @@ const styles = StyleSheet.create({
     fontSize: 52,
     textAlign: 'center',
     fontWeight: '700',
-    marginTop: height / 5,
     marginBottom: 16,
+    marginTop: 16,
   },
   introText: {
     color: '#474747',
     fontSize: 28,
     fontWeight: '500',
     textAlign: 'center',
-    marginBottom: 60,
+    marginBottom: 64,
   },
   startButton: {
     backgroundColor: '#e85454',
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     width: width - 32,
     marginLeft: 16,
     marginRight: 16,
+    marginTop: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 28,
@@ -39,8 +40,8 @@ const styles = StyleSheet.create({
     width: width - 32,
     marginLeft: 16,
     marginRight: 16,
-    marginTop: 16,
-    marginBottom: 30,
+    marginTop: 64,
+    marginBottom: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 28,
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    paddingBottom: 30,
+    paddingBottom: 32,
   },
   whyTitle: {
     color: '#e85454',
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingBottom: 60,
+    paddingBottom: 64,
     paddingLeft: 16,
     paddingRight: 16,
   },
@@ -138,15 +139,15 @@ const styles = StyleSheet.create({
   },
   past: {
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 64,
   },
   pastTitle: {
     textAlign: 'center',
     color: '#e85454',
     fontSize: 24,
     fontWeight: '800',
-    marginTop: 30,
-    marginBottom: 15,
+    marginTop: 16,
+    marginBottom: 16,
   },
   pastExercises: {
     flex: 1,
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     margin: 16,
-    marginBottom: 40,
+    marginBottom: 64,
     width: width - 32,
   },
   takeAgainButtonText: {
@@ -204,14 +205,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   shareTitleView: {
-    marginBottom: 40,
+    marginBottom: 16,
   },
   shareTitle: {
     color: '#474747',
     textAlign: 'center',
     fontWeight: '500',
     fontSize: 20,
-    marginBottom: 5,
+    marginBottom: 8,
   },
   shareTitleMain: {
     color: '#e85454',
@@ -222,7 +223,6 @@ const styles = StyleSheet.create({
   shareButtons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
   },
   shareButton: {
     backgroundColor: '#e85454',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     height: width / 5,
     borderRadius: width / 10,
-    margin: 5,
+    margin: 8,
   },
 });
 
