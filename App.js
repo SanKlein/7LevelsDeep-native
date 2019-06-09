@@ -12,7 +12,12 @@ import KeyboardSpacer from 'react-native-keyboard-spacer';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
-  rate, shareTwitter, shareLinkedin, shareFacebook, shareEmail,
+  loadParker,
+  rate,
+  shareTwitter,
+  shareLinkedin,
+  shareFacebook,
+  shareEmail,
 } from './helpers';
 import styles from './styles';
 
@@ -149,11 +154,75 @@ class App extends Component {
 
     const hasExercises = !!pastAnswers.length;
 
-    return (
+    return hasExercises ? (
       <SafeAreaView style={styles.app}>
         <ScrollView>
+          <Text style={styles.otherTitle}>7 Levels Deep</Text>
+          <Text style={styles.introText}>Discover Your Why</Text>
+          <TouchableOpacity style={styles.startOverButton} onPress={this.startExercise}>
+            <Text style={styles.startButtonText}>START OVER</Text>
+          </TouchableOpacity>
+          <View style={styles.past}>
+            <Text style={styles.pastTitle}>Past Answers</Text>
+            <View style={styles.pastExercises}>
+              {pastAnswers.map((e, index) => (
+                <View style={styles.pastExercise} key={`answers${index + 1}`}>
+                  <TouchableOpacity
+                    style={styles.pastExerciseButton}
+                    onPress={() => this.loadExercise(index)}
+                  >
+                    <Text style={styles.pastExerciseText} ellipsizeMode="tail" numberOfLines={1}>
+                      {e[0]}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deletePastExerciseButton}
+                    onPress={() => this.deleteExercise(index)}
+                  >
+                    <Text style={styles.deletePastExerciseButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <TouchableOpacity style={styles.takeAgainButton} onPress={this.startExercise}>
+              <Text style={styles.takeAgainButtonText}>START NEW ANSWER</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.share}>
+            <View style={styles.shareTitleView}>
+              <Text style={styles.shareTitle}>If you found 7 Levels Deep useful,</Text>
+              <Text style={styles.shareTitleMain}>Share It</Text>
+            </View>
+            <View style={styles.shareButtons}>
+              <TouchableOpacity style={styles.shareButton} onPress={shareTwitter}>
+                <FontAwesome name="twitter" color="#fff" size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={shareFacebook}>
+                <FontAwesome name="facebook" color="#fff" size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={shareLinkedin}>
+                <FontAwesome name="linkedin" color="#fff" size={24} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.shareButton} onPress={shareEmail}>
+                <MaterialIcons name="email" color="#fff" size={24} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.rateButton} onPress={rate}>
+            <Text style={styles.startButtonText}>RATE 7 LEVELS DEEP</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.createdBy} onPress={loadParker}>
+            <Text style={styles.createdByText}>Created by Parker</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    ) : (
+      <SafeAreaView style={styles.startApp}>
+        <View style={styles.intro}>
           <Text style={styles.title}>7 Levels Deep</Text>
           <Text style={styles.introText}>Discover Your Why</Text>
+        </View>
+        <View style={styles.reason}>
           {!hasExercises && (
             <View style={styles.why}>
               <Text style={styles.whyTitle}>WHAT?</Text>
@@ -166,65 +235,12 @@ class App extends Component {
               <Text style={styles.whyText}>Discover why you take action</Text>
             </View>
           )}
+        </View>
+        <View style={styles.start}>
           <TouchableOpacity style={styles.startButton} onPress={this.startExercise}>
             <Text style={styles.startButtonText}>{hasExercises ? 'START OVER' : 'START'}</Text>
           </TouchableOpacity>
-          {hasExercises && (
-            <View style={styles.past}>
-              <Text style={styles.pastTitle}>Past Answers</Text>
-              <View style={styles.pastExercises}>
-                {pastAnswers.map((e, index) => (
-                  <View style={styles.pastExercise} key={`answers${index + 1}`}>
-                    <TouchableOpacity
-                      style={styles.pastExerciseButton}
-                      onPress={() => this.loadExercise(index)}
-                    >
-                      <Text style={styles.pastExerciseText} ellipsizeMode="tail" numberOfLines={1}>
-                        {e[0]}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.deletePastExerciseButton}
-                      onPress={() => this.deleteExercise(index)}
-                    >
-                      <Text style={styles.deletePastExerciseButtonText}>Delete</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-              <TouchableOpacity style={styles.takeAgainButton} onPress={this.startExercise}>
-                <Text style={styles.takeAgainButtonText}>START NEW ANSWER</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {hasExercises && (
-            <View style={styles.share}>
-              <View style={styles.shareTitleView}>
-                <Text style={styles.shareTitle}>If you found 7 Levels Deep useful,</Text>
-                <Text style={styles.shareTitleMain}>Share It</Text>
-              </View>
-              <View style={styles.shareButtons}>
-                <TouchableOpacity style={styles.shareButton} onPress={shareTwitter}>
-                  <FontAwesome name="twitter" color="#fff" size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.shareButton} onPress={shareFacebook}>
-                  <FontAwesome name="facebook" color="#fff" size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.shareButton} onPress={shareLinkedin}>
-                  <FontAwesome name="linkedin" color="#fff" size={24} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.shareButton} onPress={shareEmail}>
-                  <MaterialIcons name="email" color="#fff" size={24} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-          {hasExercises && (
-            <TouchableOpacity style={styles.rateButton} onPress={rate}>
-              <Text style={styles.startButtonText}>RATE 7 LEVELS DEEP</Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
+        </View>
       </SafeAreaView>
     );
   }

@@ -29,3 +29,7 @@ export function rate() {
     'https://itunes.apple.com/us/app/7-levels-deep-discover-your-why/id1214661840?mt=8',
   );
 }
+
+export function loadParker() {
+  Linking.openURL('http://www.parkerklein.me');
+}
