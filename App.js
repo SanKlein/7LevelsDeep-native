@@ -6,7 +6,7 @@ import {
   Text,
   TextInput,
   AsyncStorage,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -17,7 +17,7 @@ import {
   shareTwitter,
   shareLinkedin,
   shareFacebook,
-  shareEmail,
+  shareEmail
 } from './helpers';
 import styles from './styles';
 
@@ -28,13 +28,13 @@ const questions = [
   'Why is that important to you?',
   'Why is that important to you?',
   'Why is that important to you?',
-  'Why is that important to you?',
+  'Why is that important to you?'
 ];
 
 const initialState = {
   answer: 0,
   answers: new Array(7).fill(''),
-  pastAnswers: [],
+  pastAnswers: []
 };
 
 class App extends Component {
@@ -52,7 +52,7 @@ class App extends Component {
 
   componentWillMount() {
     AsyncStorage.getItem('levelsStore')
-      .then((value) => {
+      .then(value => {
         if (value && value.length) {
           this.setState(JSON.parse(value));
         }
@@ -67,14 +67,14 @@ class App extends Component {
   startExercise() {
     this.setState({
       answer: 1,
-      answers: initialState.answers,
+      answers: initialState.answers
     });
   }
 
   changeAnswer(text) {
     const { answer, answers } = this.state;
     this.setState({
-      answers: [...answers.slice(0, answer - 1), text, ...answers.slice(answer)],
+      answers: [...answers.slice(0, answer - 1), text, ...answers.slice(answer)]
     });
   }
 
@@ -84,7 +84,11 @@ class App extends Component {
       this.setState({
         pastAnswers: [...(pastAnswers || []), answers],
         answers: initialState.answers,
-        answer: 0,
+        answer: 0
+      });
+      fetch('https://www.7levelsdeep.com/api/count', {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' }
       });
       return;
     }
@@ -101,7 +105,7 @@ class App extends Component {
     const { pastAnswers } = this.state;
     this.setState({
       answer: 0,
-      pastAnswers: [...pastAnswers.slice(0, index), ...pastAnswers.slice(index + 1)],
+      pastAnswers: [...pastAnswers.slice(0, index), ...pastAnswers.slice(index + 1)]
     });
   }
 
@@ -116,9 +120,7 @@ class App extends Component {
           <View style={styles.answerContainer}>
             <Text style={styles.answerPromptText}>
               {answer}
-              .
-{' '}
-{questions[answer - 1]}
+              . {questions[answer - 1]}
             </Text>
             <View style={styles.answer}>
               <TextInput
