@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
+  Share,
   View,
   Text,
   TextInput,
@@ -9,6 +11,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
@@ -48,6 +51,7 @@ class App extends Component {
     this.next = this.next.bind(this);
     this.loadExercise = this.loadExercise.bind(this);
     this.deleteExercise = this.deleteExercise.bind(this);
+    this.shareExercise = this.shareExercise.bind(this);
   }
 
   componentWillMount() {
@@ -109,14 +113,30 @@ class App extends Component {
     });
   }
 
+  shareExercise(e) {
+    let text = '';
+
+    questions.forEach((q, index) => {
+      text += `${q}\n`;
+      text += `${e[index]}\n\n`;
+    });
+
+    Share.share({ message: text });
+  }
+
   render() {
     const { answer, answers, pastAnswers } = this.state;
 
     const currentAnswer = answers[answer - 1];
+    const isLast = answer === 7;
+    let nextAnswer = '';
+    if (!isLast) {
+      nextAnswer = answers[answer];
+    }
 
     if (answer) {
       return (
-        <SafeAreaView style={styles.app}>
+        <View style={styles.app}>
           <View style={styles.answerContainer}>
             <Text style={styles.answerPromptText}>
               {answer}
@@ -129,7 +149,6 @@ class App extends Component {
                 multiline
                 value={currentAnswer}
                 onChangeText={text => this.changeAnswer(text)}
-                returnKeyType="next"
                 selectionColor="#474747"
               />
             </View>
@@ -150,14 +169,14 @@ class App extends Component {
             )}
           </View>
           <KeyboardSpacer />
-        </SafeAreaView>
+        </View>
       );
     }
 
     const hasExercises = !!pastAnswers.length;
 
     return hasExercises ? (
-      <SafeAreaView style={styles.app}>
+      <View style={styles.app}>
         <ScrollView>
           <Text style={styles.otherTitle}>7 Levels Deep</Text>
           <Text style={styles.introText}>Discover Your Why</Text>
@@ -178,10 +197,34 @@ class App extends Component {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.deletePastExerciseButton}
-                    onPress={() => this.deleteExercise(index)}
+                    style={styles.sharePastExerciseButton}
+                    onPress={() => this.shareExercise(e)}
                   >
-                    <Text style={styles.deletePastExerciseButtonText}>Delete</Text>
+                    <Text style={styles.sharePastExerciseButtonText}>
+                      <EvilIcons name="share-apple" color="#333" size={28} />
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.deletePastExerciseButton}
+                    onPress={() => {
+                      Alert.alert(
+                        'Are you sure you want to delete this answer?',
+                        null,
+                        [
+                          { text: 'No', onPress: () => {} },
+                          {
+                            text: 'Delete',
+                            onPress: () => this.deleteExercise(index),
+                            style: 'destructive'
+                          }
+                        ],
+                        { cancelable: false }
+                      );
+                    }}
+                  >
+                    <Text style={styles.deletePastExerciseButtonText}>
+                      <MaterialIcons name="delete" color="#e85454" size={24} />
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ))}
@@ -214,12 +257,14 @@ class App extends Component {
             <Text style={styles.startButtonText}>RATE 7 LEVELS DEEP</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.createdBy} onPress={loadParker}>
-            <Text style={styles.createdByText}>Created by Parker</Text>
+            <Text style={styles.createdByText}>Made with</Text>
+            <FontAwesome style={styles.heart} name="heart" color="#e85454" size={24} />
+            <Text style={styles.createdByText}>by Parker</Text>
           </TouchableOpacity>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     ) : (
-      <SafeAreaView style={styles.startApp}>
+      <View style={styles.startApp}>
         <View style={styles.intro}>
           <Text style={styles.title}>7 Levels Deep</Text>
           <Text style={styles.introText}>Discover Your Why</Text>
@@ -243,7 +288,7 @@ class App extends Component {
             <Text style={styles.startButtonText}>{hasExercises ? 'START OVER' : 'START'}</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 }
