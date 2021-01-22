@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontSize: 52,
     textAlign: 'center',
     fontWeight: '700',
-    paddingTop: 32,
+    paddingTop: 72,
     marginBottom: 16,
     marginTop: 48
   },
@@ -72,12 +72,12 @@ const styles = StyleSheet.create({
     marginTop: 64
   },
   rateButton: {
-    backgroundColor: '#e85454',
+    backgroundColor: '#f0f0f0',
     height: 56,
     width: width - 32,
     marginLeft: 16,
     marginRight: 16,
-    marginTop: 64,
+    margin: 8,
     marginBottom: 16,
     justifyContent: 'center',
     alignItems: 'center',
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   startButtonText: {
     color: '#fff',
     fontWeight: '700',
-    fontSize: 16
+    fontSize: 18
   },
   why: {
     justifyContent: 'center',
@@ -100,11 +100,11 @@ const styles = StyleSheet.create({
     color: '#e85454',
     marginBottom: 8,
     fontWeight: '800',
-    fontSize: 16
+    fontSize: 18
   },
   whyText: {
     color: '#474747',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '500',
     textAlign: 'center'
   },
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   takeAgainButtonText: {
     color: '#e85454',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'center'
   },
@@ -263,25 +263,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 8
   },
-  shareTitleMain: {
-    color: '#e85454',
-    fontSize: 24,
-    textAlign: 'center',
-    fontWeight: '800'
-  },
-  shareButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around'
-  },
   shareButton: {
     backgroundColor: '#e85454',
-    width: width / 5,
+    height: 56,
+    width: width - 32,
     justifyContent: 'center',
     alignItems: 'center',
-    color: '#fff',
-    height: width / 5,
-    borderRadius: width / 10,
-    margin: 8
+    borderRadius: 28,
+    padding: 16,
+    marginLeft: 16,
+    marginRight: 16,
   },
   createdBy: {
     height: 56,

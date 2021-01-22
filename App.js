@@ -179,12 +179,12 @@ class App extends Component {
       <View style={styles.app}>
         <ScrollView>
           <Text style={styles.otherTitle}>7 Levels Deep</Text>
-          <Text style={styles.introText}>Discover Your Why</Text>
+          <Text style={styles.introText}>Discover your why</Text>
           <TouchableOpacity style={styles.startOverButton} onPress={this.startExercise}>
-            <Text style={styles.startButtonText}>START OVER</Text>
+            <Text style={styles.startButtonText}>New answer</Text>
           </TouchableOpacity>
           <View style={styles.past}>
-            <Text style={styles.pastTitle}>Past Answers</Text>
+            <Text style={styles.pastTitle}>Past answers</Text>
             <View style={styles.pastExercises}>
               {pastAnswers.map((e, index) => (
                 <View style={styles.pastExercise} key={`answers${index + 1}`}>
@@ -230,31 +230,19 @@ class App extends Component {
               ))}
             </View>
             <TouchableOpacity style={styles.takeAgainButton} onPress={this.startExercise}>
-              <Text style={styles.takeAgainButtonText}>START NEW ANSWER</Text>
+              <Text style={styles.takeAgainButtonText}>New answer</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.share}>
             <View style={styles.shareTitleView}>
               <Text style={styles.shareTitle}>If you found 7 Levels Deep useful,</Text>
-              <Text style={styles.shareTitleMain}>Share It</Text>
             </View>
-            <View style={styles.shareButtons}>
-              <TouchableOpacity style={styles.shareButton} onPress={shareTwitter}>
-                <FontAwesome name="twitter" color="#fff" size={24} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.shareButton} onPress={shareFacebook}>
-                <FontAwesome name="facebook" color="#fff" size={24} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.shareButton} onPress={shareLinkedin}>
-                <FontAwesome name="linkedin" color="#fff" size={24} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.shareButton} onPress={shareEmail}>
-                <MaterialIcons name="email" color="#fff" size={24} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.shareButton} onPress={shareTwitter}>
+              <Text style={styles.startButtonText}>Share 7 Levels Deep</Text>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.rateButton} onPress={rate}>
-            <Text style={styles.startButtonText}>RATE 7 LEVELS DEEP</Text>
+            <Text style={styles.takeAgainButtonText}>Rate 7 Levels Deep</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.createdBy} onPress={loadParker}>
             <Text style={styles.createdByText}>Made with</Text>
@@ -267,25 +255,21 @@ class App extends Component {
       <View style={styles.startApp}>
         <View style={styles.intro}>
           <Text style={styles.title}>7 Levels Deep</Text>
-          <Text style={styles.introText}>Discover Your Why</Text>
+          <Text style={styles.introText}>Discover your why</Text>
         </View>
         <View style={styles.reason}>
-          {!hasExercises && (
-            <View style={styles.why}>
-              <Text style={styles.whyTitle}>WHAT?</Text>
-              <Text style={styles.whyText}>Answer 7 questions</Text>
-            </View>
-          )}
-          {!hasExercises && (
-            <View style={styles.instructions}>
-              <Text style={styles.whyTitle}>WHY?</Text>
-              <Text style={styles.whyText}>Discover why you take action</Text>
-            </View>
-          )}
+          <View style={styles.why}>
+            <Text style={styles.whyTitle}>Why?</Text>
+            <Text style={styles.whyText}>Discover why you take action</Text>
+          </View>
+          <View style={styles.instructions}>
+            <Text style={styles.whyTitle}>What?</Text>
+            <Text style={styles.whyText}>Answer 7 questions</Text>
+          </View>
         </View>
         <View style={styles.start}>
           <TouchableOpacity style={styles.startButton} onPress={this.startExercise}>
-            <Text style={styles.startButtonText}>{hasExercises ? 'START OVER' : 'START'}</Text>
+            <Text style={styles.startButtonText}>Start</Text>
           </TouchableOpacity>
         </View>
       </View>
