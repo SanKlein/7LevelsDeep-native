@@ -17,10 +17,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   loadParker,
   rate,
-  shareTwitter,
-  shareLinkedin,
-  shareFacebook,
-  shareEmail
+  share,
 } from './helpers';
 import styles from './styles';
 
@@ -237,7 +234,7 @@ class App extends Component {
             <View style={styles.shareTitleView}>
               <Text style={styles.shareTitle}>If you found 7 Levels Deep useful,</Text>
             </View>
-            <TouchableOpacity style={styles.shareButton} onPress={shareTwitter}>
+            <TouchableOpacity style={styles.shareButton} onPress={share}>
               <Text style={styles.startButtonText}>Share 7 Levels Deep</Text>
             </TouchableOpacity>
           </View>
@@ -260,11 +257,11 @@ class App extends Component {
         <View style={styles.reason}>
           <View style={styles.why}>
             <Text style={styles.whyTitle}>Why?</Text>
-            <Text style={styles.whyText}>Discover why you take action</Text>
+            <Text style={styles.whyText}>Discover what drives you to take action</Text>
           </View>
           <View style={styles.instructions}>
-            <Text style={styles.whyTitle}>What?</Text>
-            <Text style={styles.whyText}>Answer 7 questions</Text>
+            <Text style={styles.whyTitle}>Instructions</Text>
+            <Text style={styles.whyText}>Take 5-10 minutes to reflect and answer 7 questions</Text>
           </View>
         </View>
         <View style={styles.start}>
